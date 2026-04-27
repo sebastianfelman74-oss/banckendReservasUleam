@@ -95,4 +95,12 @@ server.listen(PORT, () => {
     console.log(`Accede a: http://localhost:${PORT}`);
 });
 
+app.get("/", (req, res) => {
+  res.send("Backend Railway funcionando 🚀");
+});
+
+app.get("/test", (req, res) => {
+  res.send("OK TEST");
+});
+
 module.exports = app;
