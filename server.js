@@ -9,7 +9,9 @@ const server = http.createServer(app);
 
 const allowedOrigins = [
   'http://localhost:3000',
-  process.env.FRONTEND_URL
+  process.env.FRONTEND_URL,
+  'https://frontend-reservas-uleam.vercel.app',
+  /\.vercel\.app$/  // acepta cualquier URL de Vercel
 ];
 
 // Configurar Socket.io
