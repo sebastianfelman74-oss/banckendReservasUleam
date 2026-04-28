@@ -6,17 +6,17 @@ const { verificarAdmin } = require('../middlewares/auth');
 // 1. TOTAL DE RESERVAS POR ESPACIO
 router.get("/reportes/por-espacio", verificarAdmin, (req, res) => {
     const query = `
-        SELECT 
-            rec.NOMBRE as espacio,
-            COUNT(r.RESERVAS_ID) as total,
-            SUM(CASE WHEN r.ESTADO = 'CONFIRMADA' THEN 1 ELSE 0 END) as confirmadas,
-            SUM(CASE WHEN r.ESTADO = 'PENDIENTE' THEN 1 ELSE 0 END) as pendientes,
-            SUM(CASE WHEN r.ESTADO = 'CANCELADA' THEN 1 ELSE 0 END) as canceladas
-        FROM recursos rec
-        LEFT JOIN reservas r ON rec.RECURSOS_ID = r.RECURSOS_ID
-        GROUP BY rec.RECURSOS_ID, rec.NOMBRE
-        ORDER BY total DESC
-    `;
+    SELECT 
+        DATE_FORMAT(FECHA_INICIO, '%Y-%m') as mes,
+        DATE_FORMAT(FECHA_INICIO, '%M %Y') as mes_nombre,
+        COUNT(*) as total,
+        SUM(CASE WHEN ESTADO = 'CONFIRMADA' THEN 1 ELSE 0 END) as confirmadas,
+        SUM(CASE WHEN ESTADO = 'PENDIENTE' THEN 1 ELSE 0 END) as pendientes,
+        SUM(CASE WHEN ESTADO = 'CANCELADA' THEN 1 ELSE 0 END) as canceladas
+    FROM reservas
+    GROUP BY mes, mes_nombre
+    ORDER BY mes ASC
+`;
 
     connection.query(query, (err, results) => {
         if (err) {
