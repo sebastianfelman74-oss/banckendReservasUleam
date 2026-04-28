@@ -46,7 +46,7 @@ router.post("/reserva", verificarUsuarioAutenticado, (req, res) => {
     // Obtener horarios bloqueados
     const queryBloqueados = `
         SELECT HORA_INICIO, HORA_FIN, MATERIA 
-        FROM HORARIOS_BLOQUEADOS 
+        FROM horarios_bloqueados 
         WHERE RECURSOS_ID = ? 
             AND DIA_SEMANA = ?
             AND ? BETWEEN FECHA_INICIO AND FECHA_FIN
