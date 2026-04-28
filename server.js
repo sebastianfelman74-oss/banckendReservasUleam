@@ -9,15 +9,14 @@ const server = http.createServer(app);
 
 const allowedOrigins = [
   'http://localhost:3000',
-  process.env.FRONTEND_URL,
   'https://frontend-reservas-uleam.vercel.app',
-  /\.vercel\.app$/  // acepta cualquier URL de Vercel
+  /\.vercel\.app$/
 ];
 
 // Configurar Socket.io
 const io = new Server(server, {
     cors: {
-        origin: allowedOrigins,
+        origin: /\.vercel\.app$/,
         credentials: true,
         methods: ["GET", "POST"]
     }
@@ -26,7 +25,9 @@ const io = new Server(server, {
 // Configurar CORS
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (!origin || allowedOrigins.some(o => 
+            typeof o === 'string' ? o === origin : o.test(origin)
+        )) {
             callback(null, true);
         } else {
             callback(new Error('No permitido por CORS'));
@@ -35,6 +36,7 @@ app.use(cors({
     credentials: true
 }));
 
+app.set('trust proxy', 1);
 app.use(express.json());
 
 // Configurar sesiones
@@ -102,7 +104,7 @@ app.get("/status", (req, res) => {
 });
 
 app.get("/test", (req, res) => {
-  res.send("OK TEST");
+    res.send("OK TEST");
 });
 
 const PORT = process.env.PORT || 5000;
