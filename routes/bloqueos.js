@@ -7,7 +7,7 @@ const { verificarAdmin } = require('../middlewares/auth');
 router.get("/bloqueos", verificarAdmin, (req, res) => {
     const query = `
         SELECT h.*, r.NOMBRE as RECURSO_NOMBRE
-        FROM HORARIOS_BLOQUEADOS h
+        FROM horarios_bloqueados h
         JOIN recursos r ON h.RECURSOS_ID = r.RECURSOS_ID
         ORDER BY h.RECURSOS_ID, h.DIA_SEMANA, h.HORA_INICIO
     `;
@@ -26,7 +26,7 @@ router.get("/bloqueos/recurso/:id", (req, res) => {
     const { id } = req.params;
     const query = `
         SELECT h.*, r.NOMBRE as RECURSO_NOMBRE
-        FROM HORARIOS_BLOQUEADOS h
+        FROM horarios_bloqueados h
         JOIN recursos r ON h.RECURSOS_ID = r.RECURSOS_ID
         WHERE h.RECURSOS_ID = ?
         ORDER BY h.DIA_SEMANA, h.HORA_INICIO
@@ -80,7 +80,7 @@ router.post("/bloqueos", verificarAdmin, (req, res) => {
         TIPO
     };
 
-    connection.query('INSERT INTO HORARIOS_BLOQUEADOS SET ?', nuevoBloqueo, (err, result) => {
+    connection.query('INSERT INTO horarios_bloqueados SET ?', nuevoBloqueo, (err, result) => {
         if (err) {
             console.error("Error al crear bloqueo:", err);
             return res.status(500).json({ mensaje: "Error al crear bloqueo" });
@@ -119,7 +119,7 @@ router.put("/bloqueos/:id", verificarAdmin, (req, res) => {
         TIPO
     };
 
-    connection.query('UPDATE HORARIOS_BLOQUEADOS SET ? WHERE ID = ?', [datosActualizar, id], (err, result) => {
+    connection.query('UPDATE horarios_bloqueados SET ? WHERE ID = ?', [datosActualizar, id], (err, result) => {
         if (err) {
             console.error("Error al actualizar bloqueo:", err);
             return res.status(500).json({ mensaje: "Error al actualizar bloqueo" });
@@ -135,7 +135,7 @@ router.put("/bloqueos/:id", verificarAdmin, (req, res) => {
 router.delete("/bloqueos/:id", verificarAdmin, (req, res) => {
     const { id } = req.params;
 
-    connection.query('DELETE FROM HORARIOS_BLOQUEADOS WHERE ID = ?', [id], (err, result) => {
+    connection.query('DELETE FROM horarios_bloqueados WHERE ID = ?', [id], (err, result) => {
         if (err) {
             console.error("Error al eliminar bloqueo:", err);
             return res.status(500).json({ mensaje: "Error al eliminar bloqueo" });
