@@ -7,10 +7,15 @@ const { Server } = require("socket.io");
 const app = express();
 const server = http.createServer(app);
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  process.env.FRONTEND_URL
+];
+
 // Configurar Socket.io
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:3000',
+        origin: allowedOrigins,
         credentials: true,
         methods: ["GET", "POST"]
     }
@@ -18,7 +23,13 @@ const io = new Server(server, {
 
 // Configurar CORS
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('No permitido por CORS'));
+        }
+    },
     credentials: true
 }));
 
@@ -26,11 +37,11 @@ app.use(express.json());
 
 // Configurar sesiones
 app.use(session({
-    secret: '123',
+    secret: process.env.SESSION_SECRET || '123',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false,
+        secure: process.env.NODE_ENV === 'production',
         maxAge: 1000 * 60 * 60 * 24
     }
 }));
@@ -59,13 +70,11 @@ app.set('io', io);
 io.on('connection', (socket) => {
     console.log('Usuario conectado:', socket.id);
 
-    // El usuario se une a su sala personal según su ID
     socket.on('unirse', (usuarioId) => {
         socket.join(`usuario_${usuarioId}`);
         console.log(`Usuario ${usuarioId} unido a su sala`);
     });
 
-    // El admin se une a la sala de admins
     socket.on('unirse_admin', () => {
         socket.join('admins');
         console.log('Admin unido a sala de admins');
@@ -89,18 +98,14 @@ app.get("/status", (req, res) => {
     });
 });
 
+app.get("/test", (req, res) => {
+  res.send("OK TEST");
+});
+
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
     console.log(`Servidor corriendo en puerto ${PORT}`);
     console.log(`Accede a: http://localhost:${PORT}`);
-});
-
-app.get("/", (req, res) => {
-  res.send("Backend Railway funcionando 🚀");
-});
-
-app.get("/test", (req, res) => {
-  res.send("OK TEST");
 });
 
 module.exports = app;
